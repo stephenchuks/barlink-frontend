@@ -2,13 +2,19 @@
 import { z } from 'zod';
 
 export const RestaurantSchema = z.object({
-  id: z.string(),
+  _id: z.string(),
   name: z.string(),
-  slug: z.string(),
+  slug: z.string().optional(),
   address: z.string(),
   phone: z.string().optional(),
   logoUrl: z.string().url().optional(),
-  openingHours: z.string().optional(),
+  operatingHours: z.array(
+    z.object({
+      open: z.string(),
+      close: z.string(),
+    })
+  ).optional(),
+  domainSlug: z.string().optional(),
 });
 
 export type Restaurant = z.infer<typeof RestaurantSchema>;
