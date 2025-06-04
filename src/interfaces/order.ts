@@ -1,7 +1,14 @@
+
+import type { CartItem } from './cart';
+
 export interface OrderItem {
   menuItem: string;
   quantity: number;
   price: number;
+}
+
+export interface CreateOrderPayload {
+  items: OrderItem[];
 }
 
 export interface Order {
