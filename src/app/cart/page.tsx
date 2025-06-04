@@ -32,7 +32,8 @@ export default function CartPage() {
         {items.map(item => (
           <CartItemRow key={item.itemId} item={item} />
         ))}
-        <CartSummary restaurantId={restaurantId} />
+        <CartSummary />
+
       </div>
     </div>
   );
