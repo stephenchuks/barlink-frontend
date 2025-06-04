@@ -1,4 +1,3 @@
-// src/components/MenuDetailHeader.tsx
 import type { Menu } from '@/interfaces/menu';
 
 export default function MenuDetailHeader({ menu }: { menu: Menu }) {

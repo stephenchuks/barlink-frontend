@@ -1,4 +1,3 @@
-// src/components/ItemList.tsx
 import type { MenuItem } from '@/interfaces/menu';
 import MenuItemCard from './MenuItemCard';
 

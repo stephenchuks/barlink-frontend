@@ -1,4 +1,3 @@
-// src/components/MenuGrid.tsx
 import type { Menu } from '@/interfaces/menu';
 import MenuCard from './MenuCard';
 

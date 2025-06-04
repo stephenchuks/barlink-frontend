@@ -1,4 +1,3 @@
-// src/components/RestaurantHeader.tsx
 import type { Restaurant } from '@/interfaces/restaurant';
 
 interface Props {

@@ -1,4 +1,3 @@
-// src/components/MenuCard.tsx
 import Link from 'next/link';
 import type { Menu } from '@/interfaces/menu';
 

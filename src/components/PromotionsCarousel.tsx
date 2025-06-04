@@ -1,4 +1,3 @@
-// src/components/PromotionsCarousel.tsx
 export default function PromotionsCarousel() {
   // Placeholder data for now
   const promotions = [

@@ -1,4 +1,3 @@
-// src/components/Footer.tsx
 export default function Footer() {
   return (
     <footer className="mt-auto w-full bg-white border-t shadow-inner py-4">
