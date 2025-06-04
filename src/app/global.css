@@ -1,0 +1,7 @@
+@import "tailwindcss/preflight";
+@import "tailwindcss/utilities";
+
+html, body {
+  min-height: 100%;
+  background: #f3f4f6;
+}
