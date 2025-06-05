@@ -1,20 +1,26 @@
 // src/lib/api.ts
-export async function api<T = any>(
+
+export async function api<T>(
   path: string,
-  opts?: RequestInit
+  options: RequestInit = {},
+  withAuth: boolean = true
 ): Promise<T> {
-  const BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
-  const res = await fetch(`${BASE}${path}`, {
-    credentials: 'include', // send cookies if needed
-    headers: {
-      'Content-Type': 'application/json',
-      ...(opts?.headers || {}),
-    },
-    ...opts,
+  const token = typeof window !== 'undefined' ? localStorage.getItem('barlink_token') : null;
+
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    ...(withAuth && token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(options.headers || {}),
+  };
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${path}`, {
+    ...options,
+    headers,
   });
+
   if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || `API error: ${res.status}`);
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.message || 'API error');
   }
   return res.json();
 }

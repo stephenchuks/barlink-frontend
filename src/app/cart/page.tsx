@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import CartSummary from '@/components/CartSummary';
 import { useCart } from '@/context/CartContext';
 import type { CartItem } from '@/interfaces/cart';
+import type { Order } from '@/interfaces/order';
 import { api } from '@/lib/api';
 
 export default function CartPage() {
@@ -25,8 +26,8 @@ export default function CartPage() {
           price: i.price,
         })),
       };
-      // Call backend API
-      const order = await api('/orders', {
+      // Call backend API, type returned value as Order
+      const order = await api<Order>('/orders', {
         method: 'POST',
         body: JSON.stringify(payload),
       });

@@ -1,22 +1,53 @@
-// src/hooks/useOrderPolling.ts
-'use client';
-import { useState, useEffect } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { api } from '@/lib/api';
-import type { Order } from '@/interfaces/order';
+import { Order } from '@/interfaces/order';
 
-export function useOrderPolling(orderId: string, initial: Order) {
-  const [order, setOrder] = useState<Order>(initial);
+interface UseOrderPollingOptions {
+  orderId: string;
+  interval?: number;
+  onUpdate?: (order: Order) => void;
+}
+
+export function useOrderPolling({
+  orderId,
+  interval = 5000,
+  onUpdate,
+}: UseOrderPollingOptions) {
+  const [order, setOrder] = useState<Order | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // ✅ FIX: correct ref typing and initialization!
+  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    const interval = setInterval(async () => {
+    if (!orderId) return;
+    let mounted = true;
+
+    async function fetchOrder() {
       try {
-        const fresh = await api<Order>(`/orders/${orderId}`);
-        setOrder(fresh);
-      } catch { /* ignore polling errors */ }
-    }, 7000); // poll every 7s
+        setLoading(true);
+        setError(null);
+        const result = await api<Order>(`/orders/${orderId}`);
+        if (!mounted) return;
+        setOrder(result);
+        if (onUpdate) onUpdate(result);
+      } catch (err: any) {
+        if (!mounted) return;
+        setError(err.message || 'Failed to fetch order');
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
 
-    return () => clearInterval(interval);
-  }, [orderId]);
+    fetchOrder();
+    timer.current = setInterval(fetchOrder, interval);
 
-  return order;
+    return () => {
+      mounted = false;
+      if (timer.current) clearInterval(timer.current);
+    };
+  }, [orderId, interval, onUpdate]);
+
+  return { order, loading, error };
 }
