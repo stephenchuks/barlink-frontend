@@ -1,13 +1,14 @@
+// src/components/MenuGrid.tsx
 import type { Menu } from '@/interfaces/menu';
 import MenuCard from './MenuCard';
 
 interface Props {
   menus: Menu[];
-  restaurantSlug?: string;
+  restaurantSlug: string;
 }
 
 export default function MenuGrid({ menus, restaurantSlug }: Props) {
-  if (!menus.length) {
+  if (!menus?.length) {
     return (
       <div className="text-center text-gray-500 py-12">
         No menus found for this restaurant.

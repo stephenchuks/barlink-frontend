@@ -1,8 +1,9 @@
+// src/app/auth/login/page.tsx
 'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { api } from '@/lib/api';
+import { apiFetch } from '@/lib/api';
 import { toast } from 'sonner';
 
 export default function LoginPage() {
@@ -15,18 +16,19 @@ export default function LoginPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      // Correct usage: 3rd param disables Bearer
-      const res = await api<{ token: string }>(
+      // Use '' as slug for platform login (not tenant/restaurant-specific)
+      const res = await apiFetch<{ token: string }>(
+        '', // No slug required for platform login
         '/auth/login',
         {
           method: 'POST',
           body: JSON.stringify({ email, password }),
         },
-        false // <--- disables Bearer
+        false // No auth header needed for login
       );
       localStorage.setItem('barlink_token', res.token);
       toast.success('Login successful!');
-      router.push('/'); // Redirect to homepage or dashboard
+      router.push('/'); // Or dashboard/homepage
     } catch (err: any) {
       toast.error(err.message || 'Login failed. Please check your credentials.');
     } finally {

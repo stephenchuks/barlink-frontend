@@ -3,8 +3,14 @@
 import type { MenuItem } from '@/interfaces/menu';
 import { useCart } from '@/context/CartContext';
 
-export default function MenuItemCard({ item, menuId }: { item: MenuItem; menuId: string }) {
-  const { addToCart } = useCart();
+interface Props {
+  item: MenuItem;
+  menuId: string;
+  slug: string;
+}
+
+export default function MenuItemCard({ item, menuId, slug }: Props) {
+  const { addToCart } = useCart(slug);
   return (
     <div className="rounded-2xl bg-white p-4 shadow-card flex flex-col gap-2">
       <div className="font-semibold text-lg">{item.name}</div>

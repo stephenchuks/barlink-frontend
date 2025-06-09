@@ -1,15 +1,18 @@
+// src/hooks/useOrderPolling.ts
 import { useEffect, useState, useRef } from 'react';
-import { api } from '@/lib/api';
+import { apiFetch } from '@/lib/api';
 import { Order } from '@/interfaces/order';
 
 interface UseOrderPollingOptions {
   orderId: string;
+  slug?: string; // restaurant slug
   interval?: number;
   onUpdate?: (order: Order) => void;
 }
 
 export function useOrderPolling({
   orderId,
+  slug = '',
   interval = 5000,
   onUpdate,
 }: UseOrderPollingOptions) {
@@ -17,7 +20,6 @@ export function useOrderPolling({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // ✅ FIX: correct ref typing and initialization!
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -28,7 +30,10 @@ export function useOrderPolling({
       try {
         setLoading(true);
         setError(null);
-        const result = await api<Order>(`/orders/${orderId}`);
+        const result = await apiFetch<Order>(
+          slug,
+          `/orders/${orderId}`
+        );
         if (!mounted) return;
         setOrder(result);
         if (onUpdate) onUpdate(result);
@@ -47,7 +52,7 @@ export function useOrderPolling({
       mounted = false;
       if (timer.current) clearInterval(timer.current);
     };
-  }, [orderId, interval, onUpdate]);
+  }, [orderId, slug, interval, onUpdate]);
 
   return { order, loading, error };
 }

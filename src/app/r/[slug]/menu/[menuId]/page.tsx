@@ -1,24 +1,26 @@
-// src/app/r/[slug]/menu/[menuId]/page.tsx
-import { fetchAndValidate, endpoints } from '@/utils/api';
-import { MenuSchema } from '@/schemas/menu';
+import { apiFetch } from '@/lib/api';
 import MenuDetailHeader from '@/components/MenuDetailHeader';
 import ItemList from '@/components/ItemList';
 import { CartProvider } from '@/context/CartContext';
 
 interface PageParams {
-  slug: string;
-  menuId: string;
+  slug: string | string[];
+  menuId: string | string[];
 }
 
 export default async function MenuDetailPage({ params }: { params: PageParams }) {
-  let menu;
-  let error = '';
+  const slugRaw = params.slug;
+  const slug = Array.isArray(slugRaw) ? slugRaw[0] : slugRaw;
+  const menuIdRaw = params.menuId;
+  const menuId = Array.isArray(menuIdRaw) ? menuIdRaw[0] : menuIdRaw;
 
+  if (!slug || !menuId) {
+    return <div className="text-center py-12 text-red-600">Missing restaurant slug or menuId.</div>;
+  }
+
+  let menu: any = null, error = '';
   try {
-    menu = await fetchAndValidate(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/menus/${params.menuId}`,
-      MenuSchema
-    );
+    menu = await apiFetch<any>(slug, `/menus/${menuId}`, {}, false);
   } catch (err: any) {
     error = err?.message || 'An error occurred';
   }
@@ -32,13 +34,12 @@ export default async function MenuDetailPage({ params }: { params: PageParams })
     );
   }
 
-  // CartProvider must wrap all components that use cart context!
   return (
-    <CartProvider>
+    <CartProvider slug={slug}>
       <div className="max-w-2xl mx-auto px-4 py-8">
         <MenuDetailHeader menu={menu} />
         <h2 className="text-lg font-bold text-gray-700 mb-2">Items</h2>
-        <ItemList items={menu.items} menuId={menu._id} />
+        <ItemList items={menu.items} menuId={menu._id} slug={slug} />
       </div>
     </CartProvider>
   );

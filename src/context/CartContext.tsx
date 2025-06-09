@@ -11,12 +11,13 @@ interface CartContextType {
   removeFromCart: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
+  slug: string;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
-const STORAGE_KEY = 'barlink_cart';
 
-export function CartProvider({ children }: { children: React.ReactNode }) {
+export function CartProvider({ children, slug }: { children: React.ReactNode; slug: string }) {
+  const STORAGE_KEY = `barlink_cart_${slug}`;
   const [items, setItems] = useState<CartItem[]>([]);
 
   // Load from localStorage on mount
@@ -25,14 +26,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) setItems(JSON.parse(raw));
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug]);
 
   // Save to localStorage on change
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
     }
-  }, [items]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items, slug]);
 
   function addToCart(menuItem: MenuItem, menuId: string) {
     setItems(prev => {
@@ -77,14 +80,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <CartContext.Provider value={{ items, addToCart, removeFromCart, updateQuantity, clearCart }}>
+    <CartContext.Provider value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, slug }}>
       {children}
     </CartContext.Provider>
   );
 }
 
-export function useCart() {
+export function useCart(slug: string) {
   const ctx = useContext(CartContext);
   if (!ctx) throw new Error('useCart must be used within CartProvider');
+  if (ctx.slug !== slug) throw new Error(`CartContext slug mismatch: expected "${slug}" but context is "${ctx.slug}"`);
   return ctx;
 }

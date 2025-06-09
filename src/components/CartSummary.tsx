@@ -3,8 +3,12 @@
 import { useCart } from '@/context/CartContext';
 import CartItemRow from './CartItemRow';
 
-export default function CartSummary() {
-  const { items, clearCart } = useCart();
+interface Props {
+  slug: string;
+}
+
+export default function CartSummary({ slug }: Props) {
+  const { items, clearCart } = useCart(slug);
   const subtotal = items.reduce((sum: number, i) => sum + i.price * i.quantity, 0);
 
   if (items.length === 0)
@@ -20,7 +24,7 @@ export default function CartSummary() {
       <h2 className="text-xl font-bold mb-3">Your Order</h2>
       <div>
         {items.map((item) => (
-          <CartItemRow key={item.itemId} item={item} />
+          <CartItemRow key={item.itemId} item={item} slug={slug} />
         ))}
       </div>
       <div className="flex justify-between font-semibold mt-4">

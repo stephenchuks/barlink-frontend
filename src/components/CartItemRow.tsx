@@ -4,8 +4,13 @@ import { useCart } from '@/context/CartContext';
 import type { CartItem } from '@/interfaces/cart';
 import { X } from 'lucide-react';
 
-export default function CartItemRow({ item }: { item: CartItem }) {
-  const { updateQuantity, removeFromCart } = useCart();
+interface Props {
+  item: CartItem;
+  slug: string;
+}
+
+export default function CartItemRow({ item, slug }: Props) {
+  const { updateQuantity, removeFromCart } = useCart(slug);
 
   return (
     <div className="flex items-center justify-between gap-2 p-3 rounded-xl bg-white shadow-card mb-2">

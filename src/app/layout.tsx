@@ -1,25 +1,17 @@
 // src/app/layout.tsx
+import '../app/global.css';
 
-import './globals.css';
-import './globals.css';
-import Header from '@/components/Header';
-import { CartProvider } from '@/context/CartContext';  // <-- Make sure import path is correct
-import { Toaster } from 'sonner';
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="bg-gray-50 min-h-screen">
-        {/* PROVIDER MUST BE OUTSIDE Header */}
-        <CartProvider>
-          <Header />
-          <main className="pt-4 pb-10 max-w-4xl mx-auto">{children}</main>
-        </CartProvider>
-        <Toaster position="top-right" richColors closeButton duration={4500} />
+      <head>
+        <title>Temporarily BarLink</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
+      </head>
+      <body className="font-sans bg-gray-50 text-gray-900 antialiased min-h-screen flex flex-col">
+        {children}
       </body>
     </html>
   );

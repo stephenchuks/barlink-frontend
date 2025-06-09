@@ -1,30 +1,41 @@
 // src/app/r/[slug]/page.tsx
-import { fetchAndValidate, endpoints } from '@/utils/api';
 import { RestaurantSchema } from '@/schemas/restaurant';
 import { MenuArraySchema } from '@/schemas/menu';
+import { apiFetch } from '@/lib/api';
 import RestaurantHeader from '@/components/RestaurantHeader';
 import MenuGrid from '@/components/MenuGrid';
 
 interface PageParams {
-  slug: string;
+  slug: string | string[];
 }
 
 export default async function RestaurantPage({ params }: { params: PageParams }) {
-  let restaurant = undefined;
-  let menus = undefined;
+  // Safe extraction of slug
+  const slugRaw = params.slug;
+  const slug = Array.isArray(slugRaw) ? slugRaw[0] : slugRaw;
+  if (!slug) {
+    return <div className="max-w-2xl mx-auto py-12 text-center text-red-600">Missing restaurant context.</div>;
+  }
+
+  let restaurant;
+  let menus;
   let error = '';
 
   try {
-    restaurant = await fetchAndValidate(
-      endpoints.getRestaurantBySlug(params.slug),
-      RestaurantSchema
+    restaurant = await apiFetch<typeof RestaurantSchema._type>(
+      slug,
+      `/restaurants/slug/${slug}`,
+      {},
+      false
     );
-    menus = await fetchAndValidate(
-      endpoints.getMenusByRestaurant(restaurant._id),
-      MenuArraySchema
+    menus = await apiFetch<typeof MenuArraySchema._type>(
+      slug,
+      `/menus?restaurant=${restaurant._id}`,
+      {},
+      false
     );
   } catch (err: any) {
-    error = err?.message || 'An error occurred';
+    error = err?.message || 'Failed to fetch restaurant data';
   }
 
   if (error) {
@@ -35,8 +46,6 @@ export default async function RestaurantPage({ params }: { params: PageParams })
       </div>
     );
   }
-
-  // **New: Only render if data is definitely present**
   if (!restaurant || !menus) {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center">
@@ -50,7 +59,7 @@ export default async function RestaurantPage({ params }: { params: PageParams })
     <div className="max-w-3xl mx-auto px-4 py-8">
       <RestaurantHeader restaurant={restaurant} />
       <h2 className="text-lg font-bold text-gray-700 mb-2">Menus</h2>
-      <MenuGrid menus={menus} restaurantSlug={params.slug} />
+      <MenuGrid menus={menus} restaurantSlug={slug} />
     </div>
   );
 }

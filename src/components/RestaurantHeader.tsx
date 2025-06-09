@@ -1,3 +1,4 @@
+// src/components/RestaurantHeader.tsx
 import type { Restaurant } from '@/interfaces/restaurant';
 
 interface Props {
@@ -5,6 +6,7 @@ interface Props {
 }
 
 export default function RestaurantHeader({ restaurant }: Props) {
+  if (!restaurant) return null;
   return (
     <section className="bg-white rounded-2xl shadow-card px-6 py-6 mb-6">
       <div className="flex items-center gap-4">
@@ -20,10 +22,7 @@ export default function RestaurantHeader({ restaurant }: Props) {
           <p className="text-gray-600 text-sm">{restaurant.address}</p>
           {restaurant.operatingHours && (
             <div className="text-xs text-gray-500 mt-1">
-              Hours:&nbsp;
-              {restaurant.operatingHours
-                .map((h) => `${h.open}–${h.close}`)
-                .join(', ')}
+              Hours: {restaurant.operatingHours.map(h => `${h.open}–${h.close}`).join(', ')}
             </div>
           )}
         </div>
